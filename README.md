@@ -91,19 +91,6 @@ If your code prints a **"Response [200]"** message, your message is then success
 
 
 
-
-
-
-
-
----
-title: "Send Email in Batch with Mailgun API using Python"
-date: 2019-03-08
-draft: False
----
-
-
-
 # Batch Sending With Mailgun API
 
 
