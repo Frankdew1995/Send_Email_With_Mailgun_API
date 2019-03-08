@@ -87,3 +87,156 @@ requests.post(
 ```
 
 If your code prints a **"Response [200]"** message, your message is then successfully sent.
+
+
+
+
+
+
+
+
+
+---
+title: "Send Email in Batch with Mailgun API using Python"
+date: 2019-03-08
+draft: False
+---
+
+
+
+# Batch Sending With Mailgun API
+
+
+
+Step 1: create a mailing list in mailgun [dashboard](https://app.mailgun.com/app/lists):
+
+1. You can upload a csv file to bulk upload to create a mailing list
+2. Or add one recipient at a time to create a mailing list.
+
+
+Imagine you created a mailing list: **no-reply@yourdomain.com**
+
+
+## How to proceed with coding:
+
+#### A. Send a general email without a custom greeting using Mailgun Mailing List
+
+
+```python
+import requests
+```
+
+
+```python
+def batch_mailing():
+
+    requests.post(
+
+        "https://api.mailgun.net/v3/yourdomain/messages",
+        auth=("api", "your-api"),
+        data = {
+            "from": "you@yourdomain.com",
+            "to":"no-reply@yourdomain.com", # this is the mailing list created in mailgun dashboard
+            "subject":" Prank message for you",
+            "text": '''
+                        Hello,
+                        Can you hear me? It's me again.
+                    '''})
+
+# Run the function
+batch_mailing()
+```
+
+Running above code sends the message to all the members of your mailing list created in the Mailgun dashboard **WITHOUT** disclosing each member's individual email address in the "to" section of the email **DESPITE** this mailing list is currently placed in the "to" parameter.
+
+#### B. Send a custom & personalized email via Mailgun **Template Variable**.
+
+The code will take very much after. The only caveat is that we need to pass a **template variable** into the text body:
+
+Find more about template variable in the [mailgun documentation page](https://documentation.mailgun.com/en/latest/user_manual.html#batch-sending)
+
+Here's how we proceed: we will pass the first name of each member from the mailing list. the template variable for first name is: **%recipient_fname%**
+
+
+
+
+
+```python
+import requests
+
+def batch_mailing():
+
+    requests.post(
+
+        "https://api.mailgun.net/v3/yourdomain/messages",
+        auth=("api", "your-api"),
+        data = {
+            "from": "you@yourdomain.com",
+            "to":"no-reply@yourdomain.com", # this is the mailing list created in mailgun dashboard
+            "subject":" Prank message for you",
+            # passing the template variable for first name to send a custom email.
+            "text": '''
+                        Hello %recipient_fname%,
+                        Can you hear me? It's me again.
+                    '''})
+
+# Run the function
+batch_mailing()
+```
+
+Running above code sends a custom message that looks like:(with the person's first name in the body text.)
+
+"Hello Frank,
+Can you hear me? It's me again. ",
+
+"Hello Alice,
+Can you hear me? It's me again. ",
+
+........
+
+
+**
+Do not worry about how a template variable is associated with an actual member from the mailing list. This mapping gets automatically created for you by Mailgun when a mailing list created. You just have to learn how to reference them correctly.
+**
+
+#### C. Send an email **WITHOUT ** Mailgun's mailing list feature and custom greetings.
+
+In this case, your script will read the csv file of different recipients and send the email right up without using a mailing list. The down side of this is you lose the functionality of applying the template variables.
+
+
+```python
+import requests
+
+# Import pandas to read the recipients csv file.
+import pandas as pd
+```
+
+
+```python
+# Convert the pandas Series "Email" to a list
+
+recipients = pd.read_csv("MailingList.csv")["Email"].values.tolist()
+```
+
+
+```python
+def batch_mailing():
+
+    requests.post(
+
+        "https://api.mailgun.net/v3/your domain/messages",
+        auth=("api", "your api key"),
+        data = {
+            "from": "you@yourdomain.com",
+            "to":"you@yourdomain",
+            "bcc":recipients,
+            "subject":" Prank message for you",
+            "text": '''
+                    Hello,
+                    Can you hear me? It's me again.
+                    '''})
+#run the func
+batch_mailing()
+```
+
+In order for the above code to work, you have to **at least** pass one recipient or passing a list of recipients in "to", and pass your recipients' list in **bcc** so that you won't accidentally disclose all emails in the "to" field while sending the email. If **no** variable passed in "to" key, a 404 error will be throwed in this case.
