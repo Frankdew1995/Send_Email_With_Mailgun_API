@@ -227,3 +227,46 @@ batch_mailing()
 ```
 
 In order for the above code to work, you have to **at least** pass one recipient or passing a list of recipients in "to", and pass your recipients' list in **bcc** so that you won't accidentally disclose all emails in the "to" field while sending the email. If **no** variable passed in "to" key, a 404 error will be throwed in this case.
+
+
+
+
+
+## Send attachments with Mailgun Python API
+
+
+```python
+import requests
+```
+
+
+```python
+def send_attachments():
+
+    return requests.post(
+        "https://api.mailgun.net/v3/yourdomain.com/messages",
+        auth=("api", "your-api-key"),
+
+        # If sending several files, then pass serveral tuples in this list
+        files = [("attachment", ("happy-coffee.jpg",
+                  open("coffee-cup-working-happy.jpg", "rb").read()))],
+        data = {
+            "from": "youremail@mail.com",
+            "to":"recipient@recipients.com",
+            "subject":"Hello, you ordered some coffee!!",
+            "text": "Hey, your coffee is here!!"
+            })
+
+
+```
+
+
+```python
+# Run the function
+send_attachments()
+```
+
+
+
+
+    <Response [200]>
